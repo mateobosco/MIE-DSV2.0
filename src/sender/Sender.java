@@ -68,6 +68,26 @@ public class Sender {
 		return 0;
 	}
 	
+	public int sendMessage(String message){
+		int val = -1;
+		try {
+			val = this.receptor.receiveMessage(message, this.node.getMyIp(), this.node.getMyPort());
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		return val;
+	}
+	
+	public int retransmitMessage(String message, String senderIp, int senderPort){
+		int val = -1;
+		try {
+			val = this.receptor.receiveMessage(message, senderIp, senderPort);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		return val;
+	}
+	
 	public String getIpTo(){
 		return ipTo;
 	}

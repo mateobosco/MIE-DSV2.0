@@ -11,35 +11,24 @@ public class Main {
 		Node node4 = new Node("127.0.0.1", 2011, "127.0.0.1", 2014);
 		Node node5 = new Node("127.0.0.1", 2011, "127.0.0.1", 2015);
 		
-		System.out.println("-----------------SE CONECTARON TODOS--------------");
-		imprimirEstadoNodo(node1);
-		imprimirEstadoNodo(node2);
-		imprimirEstadoNodo(node3);
-		imprimirEstadoNodo(node4);
-		imprimirEstadoNodo(node5);
-		
-		node3.logout();
-		System.out.println("-----------------SE DESCONECTA 3--------------");
-		imprimirEstadoNodo(node1);
-		imprimirEstadoNodo(node2);
-		imprimirEstadoNodo(node4);
-		imprimirEstadoNodo(node5);
-		
-		node2.logout();
-		System.out.println("-----------------SE DESCONECTA 2--------------");
-		imprimirEstadoNodo(node1);
-		imprimirEstadoNodo(node4);
-		imprimirEstadoNodo(node5);
-		
-		node1.logout();
-		node4.logout();
-		System.out.println("-----------------SE DESCONECTA 1 y 4--------------");
-		imprimirEstadoNodo(node5);
-		
+		node1.sendMessage("me conecte manga de caretaas");
+		imprimirListaDeMensajes(node1);
+		imprimirListaDeMensajes(node2);
+		imprimirListaDeMensajes(node3);
+		imprimirListaDeMensajes(node4);
+		imprimirListaDeMensajes(node5);
 	}
 	
 	public static void imprimirEstadoNodo(Node n){
 		System.out.println("Soy el nodo " + n.getMyPort() + " envio a " + n.getSender().getPortTo() + " recivo de " + n.getReceptor().getPortFrom());
+	}
+	
+	public static void imprimirListaDeMensajes(Node n){
+		System.out.println("----MENSAJES DE NODO " + n.getMyPort() + " -------------");
+		for (int i = 0 ; i < n.getMessages().size(); i++){
+			String m = n.getMessages().get(i);
+			System.out.println(i + " : " + m);
+		}
 	}
 
 }

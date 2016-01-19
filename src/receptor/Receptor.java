@@ -43,8 +43,8 @@ public class Receptor implements IReceptor{
 		return 0;
 	}
 	
-	public int sendLogout(String ipLast, int portLast) throws RemoteException{
-		
+	public int receiveMessage(String message, String senderIp, int senderPort){
+		this.node.receiveMessage(message, senderIp, senderPort);
 		return 0;
 	}
 	

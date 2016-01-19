@@ -3,6 +3,7 @@ package node;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 
 import receptor.IReceptor;
 import receptor.Receptor;
@@ -16,18 +17,33 @@ public class Node {
 	private String myIp;
 	private int myPort;
 	
+	private ArrayList<String> messageList;
+	
 	public Node(String ipTo, int portTo, String myIp, int myPort){
 		this.myIp = myIp;
 		this.myPort = myPort;
 		
 		this.receptor = this.createReceptor(myPort);
 		this.sender = new Sender(this, ipTo, portTo);
+		this.messageList = new ArrayList<String>();
 		
 		this.sender.connect();
 				
-		this.sender.login(ipTo, portTo, myIp, myPort);
-
+		this.sender.login(ipTo, portTo, myIp, myPort);	
+	}
+	
+	public int sendMessage(String message){
+		this.sender.sendMessage(message);
 		
+		return 0;
+	}
+	
+	public int receiveMessage(String message, String senderIp, int senderPort){
+		this.messageList.add(message);
+		if (!senderIp.equals(this.myIp) || senderPort != this.myPort){
+			this.sender.retransmitMessage(message, senderIp, senderPort);
+		}
+		return 0;
 	}
 	
 	public int receiveLogin(String ipTo, int portTo, String ipFrom, int portFrom){
@@ -109,6 +125,10 @@ public class Node {
 
 	public int getMyPort() {
 		return myPort;
+	}
+	
+	public ArrayList<String> getMessages(){
+		return this.messageList;
 	}
 	
 	
