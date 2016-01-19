@@ -59,6 +59,15 @@ public class Sender {
 		return 0;
 	}
 	
+	public int sendLogout(String disconnectedIp, int disconnectedPort, String newLastIp, int newLastPort){
+		try {
+			this.receptor.sendLogout(disconnectedIp, disconnectedPort, newLastIp, newLastPort);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+	
 	public String getIpTo(){
 		return ipTo;
 	}

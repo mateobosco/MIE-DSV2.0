@@ -37,11 +37,17 @@ public class Receptor implements IReceptor{
 		return 0;
 		
 	}
-
-	public int logout() throws RemoteException {
+	
+	public int sendLogout(String disconnectedIp, int disconnectedPort, String newLastIp, int newLastPort) throws RemoteException {
+		this.node.sendLogout(disconnectedIp, disconnectedPort, newLastIp, newLastPort);
 		return 0;
 	}
-
+	
+	public int sendLogout(String ipLast, int portLast) throws RemoteException{
+		
+		return 0;
+	}
+	
 	public String getIpFrom() {
 		return ipFrom;
 	}
@@ -49,5 +55,6 @@ public class Receptor implements IReceptor{
 	public int getPortFrom() {
 		return portFrom;
 	}
+
 
 }

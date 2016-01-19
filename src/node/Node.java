@@ -1,6 +1,5 @@
 package node;
 
-import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
@@ -42,8 +41,6 @@ public class Node {
 		else{
 			this.sender.sendLogin(myIp, myPort, ipFrom, portFrom);
 		}
-		
-		
 		return 0;	
 	}
 	
@@ -60,6 +57,24 @@ public class Node {
 		
 		return 0;
 	}
+	
+	public int logout(){
+		return this.sender.sendLogout(myIp, myPort, this.sender.getIpTo(), this.sender.getPortTo());
+	}
+	
+	public int sendLogout(String disconnectedIp, int disconnectedPort, String newLastIp, int newLastPort){
+		if (disconnectedIp.equals(this.sender.getIpTo()) && disconnectedPort == this.sender.getPortTo()){
+			this.sender = new Sender(this, newLastIp, newLastPort);
+			this.sender.connect();
+		}
+		else{
+			this.sender.sendLogout(disconnectedIp, disconnectedPort, newLastIp, newLastPort);
+		}
+		
+		return 0;
+	}
+	
+	
 	
 	private Receptor createReceptor(int myPort){
 		String name = "Receptor";
