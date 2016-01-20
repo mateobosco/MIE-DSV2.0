@@ -26,14 +26,14 @@ public class Main {
 		node3.getNetworkStatus().print();
 		node4.getNetworkStatus().print();
 		
-		System.out.println("ME DUERMO UN RATO");
-		
-		try {
-			Thread.sleep(10000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		
+//		System.out.println("ME DUERMO UN RATO");
+//		
+//		try {
+//			Thread.sleep(10000);
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
+//		
 		node1.sendMessage(m);
 		
 		imprimirEstadoNodo(node1);

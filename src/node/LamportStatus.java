@@ -37,11 +37,22 @@ public class LamportStatus implements Serializable{
 	}
 	
 	public int getTicket(String key){
-		return this.ticket.get(key);
+		if (this.ticket.containsKey(key)){
+			return this.ticket.get(key);
+		}
+		else{
+			return 0;
+		}
+		
 	}
 	
 	public boolean getEntering(String key){
-		return this.entering.get(key);
+		if (this.entering.containsKey(key)){
+			return this.entering.get(key);
+		}
+		else{
+			return false;
+		}
 	}
 
 }

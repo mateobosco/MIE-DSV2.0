@@ -135,8 +135,8 @@ public class Sender {
 		try {
 			this.receptor.sayHi(connectionTo);
 			sendSuccess = true;
-		} catch (RemoteException e) {
-			System.out.println("-----------Crash detected------------");
+		} catch (Exception e) {
+			System.out.println("-----------Crash detected------------" + this.node.getId());
 			this.connectionTo = this.node.getNetworkStatus().getTable().get(this.connectionTo.getId());
 			this.connect();
 		}
