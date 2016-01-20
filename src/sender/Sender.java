@@ -5,7 +5,8 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-import node.LamportUpdate;
+import node.LamportStatus;
+import node.Message;
 import node.Node;
 
 import receptor.IReceptor;
@@ -69,7 +70,7 @@ public class Sender {
 		return 0;
 	}
 	
-	public int sendMessage(String message){
+	public int sendMessage(Message message){
 		int val = -1;
 		try {
 			val = this.receptor.receiveMessage(message, this.node.getMyIp(), this.node.getMyPort());
@@ -79,7 +80,7 @@ public class Sender {
 		return val;
 	}
 	
-	public int retransmitMessage(String message, String senderIp, int senderPort){
+	public int retransmitMessage(Message message, String senderIp, int senderPort){
 		int val = -1;
 		try {
 			val = this.receptor.receiveMessage(message, senderIp, senderPort);
@@ -96,19 +97,20 @@ public class Sender {
 	public int getPortTo(){
 		return portTo;
 	}
-
-
-	public void sendLamportUpdate(LamportUpdate lu) {
+	
+	public void getLamportStatus(String senderIp, int senderPort){
+		LamportStatus actualStatus = new LamportStatus();
 		try {
-			this.receptor.receiveLamportUpdate(lu, this.node.getMyIp(), this.node.getMyPort());
+			this.receptor.receiveLamportStatus(actualStatus, senderIp, senderPort);
 		} catch (RemoteException e) {
 			e.printStackTrace();
-		}		
+		}
+		
 	}
 
-	public void retransmitLamportUpdate(LamportUpdate lu, String senderIp,int senderPort) {
+	public void retransmitLamportStatus(LamportStatus actualStatus,	String senderIp, int senderPort) {
 		try {
-			this.receptor.receiveLamportUpdate(lu, senderIp, senderPort);
+			this.receptor.receiveLamportStatus(actualStatus, senderIp, senderPort);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}

@@ -11,17 +11,10 @@ public class Main {
 //		Node node4 = new Node("127.0.0.1", 2011, "127.0.0.1", 2014);
 //		Node node5 = new Node("127.0.0.1", 2011, "127.0.0.1", 2015);
 
+		Message m = new Message("127.0.0.1:2010", "pepe", "ME CONECTE MANGA DE PUTISSSSSS");
 		
-		node1.sendMessage("me conecte manga de caretaas");
-		node1.getLamport().lock();
-		
-		try {
-		    Thread.sleep(8000);
-		} catch(InterruptedException ex) {
-		    Thread.currentThread().interrupt();
-		}
-		
-		node1.getLamport().unlock();
+		node1.sendMessage(m);
+		imprimirListaDeMensajes(node1);
 	}
 	
 	public static void imprimirEstadoNodo(Node n){
@@ -31,8 +24,8 @@ public class Main {
 	public static void imprimirListaDeMensajes(Node n){
 		System.out.println("----MENSAJES DE NODO " + n.getMyPort() + " -------------");
 		for (int i = 0 ; i < n.getMessages().size(); i++){
-			String m = n.getMessages().get(i);
-			System.out.println(i + " : " + m);
+			Message m = n.getMessages().get(i);
+			System.out.println(m.getFrom() + " : " + m.getBody());
 		}
 	}
 

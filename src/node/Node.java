@@ -18,7 +18,7 @@ public class Node {
 	private String myIp;
 	private int myPort;
 	
-	private ArrayList<String> messageList;
+	private ArrayList<Message> messageList;
 	
 	public Node(String ipTo, int portTo, String myIp, int myPort){
 		this.myIp = myIp;
@@ -27,20 +27,21 @@ public class Node {
 		this.receptor = this.createReceptor(myPort);
 		this.sender = new Sender(this, ipTo, portTo);
 		this.lamport = new Lamport(this);
-		this.messageList = new ArrayList<String>();
+		this.messageList = new ArrayList<Message>();
 		
 		this.sender.connect();
 				
 		this.sender.login(ipTo, portTo, myIp, myPort);	
 	}
 	
-	public int sendMessage(String message){
+	public int sendMessage(Message message){
+		this.lamport.lock();
 		this.sender.sendMessage(message);
-		
+		this.lamport.unlock();
 		return 0;
 	}
 	
-	public int receiveMessage(String message, String senderIp, int senderPort){
+	public int receiveMessage(Message message, String senderIp, int senderPort){
 		this.messageList.add(message);
 		if (!senderIp.equals(this.myIp) || senderPort != this.myPort){
 			this.sender.retransmitMessage(message, senderIp, senderPort);
@@ -129,16 +130,16 @@ public class Node {
 		return myPort;
 	}
 	
-	public ArrayList<String> getMessages(){
+	public ArrayList<Message> getMessages(){
 		return this.messageList;
 	}
 	
 	public Lamport getLamport(){
 		return this.lamport;
 	}
-
-	public void sendLamportUpdate(LamportUpdate lu) {
-		this.sender.sendLamportUpdate(lu);
+	
+	public void getCurrentLamportStatus(){
+		this.sender.getLamportStatus(this.myIp, this.myPort);
 	}
 	
 	

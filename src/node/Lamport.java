@@ -1,42 +1,54 @@
 package node;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class Lamport {
 	
-	private HashMap<String,Integer> ticket;
-	private HashMap<String,Boolean> entering;
+	private int myTicket;
+	private boolean myEntering;
 	private Node node;
 	private String id;
+	private boolean ready;
+	private LamportStatus currentStatus;
 	
 	public Lamport(Node n){
 		this.node = n;
 		this.id = n.getMyIp() + ":" + n.getMyPort();
-		ticket = new HashMap<String,Integer>();
-		entering = new HashMap<String, Boolean>();
 	}
 	
-	public void updateLamportStatus(LamportUpdate lu){
-		this.ticket.put(lu.getKey(), lu.getTicketValue());
-		this.entering.put(lu.getKey(), lu.getEnteringValue());
+	public void getCurrentStatus(){
+		this.node.getCurrentLamportStatus();
+		this.ready = false;
+//		try {
+//			this.wait();
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
+		while (this.ready){
+			Thread.yield();
+		}
+		
 	}
+	
+	public void updateCurrentStatus(LamportStatus ls){
+		this.currentStatus = ls;
+		this.ready = true;
+//		this.notify();
+	}
+	
 	
 	public void lock(){
 //		entering.set(id, true);
-    	LamportUpdate lu = new LamportUpdate(this.id);
-    	lu.setEnteringValue(true);
-    	entering.put(this.id, true);
-    	this.node.sendLamportUpdate(lu);
-    	
-    	int n = ticket.size();
-    	List<String> keys = this.getKeys();
+		myEntering = true;
+
+    	getCurrentStatus();
+    	int n = this.currentStatus.getSize();
+    	List<String> keys = this.currentStatus.getKeys();
     	
 		int max = 0;
     	for (int index = 0; index < n; index++){
     		String i = keys.get(index);
-    		int current = ticket.get(i);
+    		int current = this.currentStatus.getTicket(i);
 			if (current > max){
 				max = current;
 			}
@@ -44,21 +56,25 @@ public class Lamport {
     	
 //    	ticket.set(id, 1 + max); 
 //    	entering.set(id, false);
-    	lu.setTicketValue(1+max);
-    	lu.setEnteringValue(false);
-    	this.ticket.put(this.id, 1 + max);
-    	this.entering.put(this.id, false);
-    	this.node.sendLamportUpdate(lu);
+    	this.myTicket = 1 + max;
+    	this.myEntering = false;
+    	
+    	getCurrentStatus();
+    	n = this.currentStatus.getSize();
+    	keys = this.currentStatus.getKeys();
     	
     	for (int index = 0; index < n; ++index) {
     		String i = keys.get(index);
     		if (i != id) {
-    			while (entering.get(i) == true) { 
-    				Thread.yield(); 
+    			while (this.currentStatus.getEntering(i) == true) { 
+    				Thread.yield();
+    				getCurrentStatus();
     			}
-    			while (ticket.get(i) != 0 && ( ticket.get(id) > ticket.get(i)  || 
-    					( ticket.get(id) == ticket.get(i) && id.compareTo(i) > 0))){ 
-    				Thread.yield(); 
+    			while (this.currentStatus.getTicket(i) != 0 && 
+    					( this.currentStatus.getTicket(id) > this.currentStatus.getTicket(i)  || 
+    					( this.currentStatus.getTicket(id) == this.currentStatus.getTicket(i) && id.compareTo(i) > 0))){ 
+    				Thread.yield();
+    				getCurrentStatus();
     			}
     		}
     	}
@@ -67,18 +83,20 @@ public class Lamport {
 	
 	public void unlock(){
 		System.out.println(this.id + " desbloqueo");
-		this.ticket.put(this.id, 0);
-		LamportUpdate lu = new LamportUpdate(this.id);
-		lu.setTicketValue(0);
-		this.node.sendLamportUpdate(lu);
+		
+		this.myTicket = 0;
 	}
 	
-	private List<String> getKeys(){
-		List<String> keys = new ArrayList<String>();
-		for(String k : this.entering.keySet()){
-			keys.add(k);
-		}
-		return keys;
+	public String getId(){
+		return this.id;
+	}
+	
+	public int getTicketValue(){
+		return this.myTicket;
+	}
+	
+	public boolean getEnteringValue(){
+		return this.myEntering;
 	}
 
 }

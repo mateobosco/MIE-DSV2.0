@@ -2,7 +2,8 @@ package receptor;
 
 import java.rmi.RemoteException;
 
-import node.LamportUpdate;
+import node.LamportStatus;
+import node.Message;
 import node.Node;
 
 public class Receptor implements IReceptor{
@@ -44,7 +45,7 @@ public class Receptor implements IReceptor{
 		return 0;
 	}
 	
-	public int receiveMessage(String message, String senderIp, int senderPort){
+	public int receiveMessage(Message message, String senderIp, int senderPort){
 		this.node.receiveMessage(message, senderIp, senderPort);
 		return 0;
 	}
@@ -57,13 +58,16 @@ public class Receptor implements IReceptor{
 		return portFrom;
 	}
 
-	public int receiveLamportUpdate(LamportUpdate lu, String senderIp, int senderPort) throws RemoteException {
-		if (!this.node.getMyIp().equals(senderIp) || this.node.getMyPort() != senderPort){
-			this.node.getLamport().updateLamportStatus(lu);
-			this.node.getSender().retransmitLamportUpdate(lu, senderIp, senderPort);
+	public int receiveLamportStatus(LamportStatus actualStatus, String senderIp, int senderPort) throws RemoteException {
+		actualStatus.addMyStatus(this.node.getLamport());
+		if (senderIp.equals(this.node.getMyIp()) && senderPort == this.node.getMyPort()){
+			this.node.getLamport().updateCurrentStatus(actualStatus);
 		}
-		
+		else{
+			this.node.getSender().retransmitLamportStatus(actualStatus, senderIp, senderPort);
+		}
 		return 0;
+
 	}
 
 
