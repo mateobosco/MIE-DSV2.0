@@ -1,11 +1,16 @@
-package node;
+package program;
+
+import node.Connection;
+import node.Message;
+import node.Node;
 
 public class Main {
 	
 	
 	public static void main(String[] args){
 		
-		Node node1 = new Node("127.0.0.1", 2010, "127.0.0.1", 2010);
+		Node node1 = new Node(new Connection("127.0.0.1", 2010), new Connection( "127.0.0.1", 2010));
+		Node node2 = new Node(new Connection("127.0.0.1", 2010), new Connection( "127.0.0.1", 2011));
 //		Node node2 = new Node("127.0.0.1", 2010, "127.0.0.1", 2011);
 		
 //		Node node4 = new Node("127.0.0.1", 2011, "127.0.0.1", 2014);
@@ -18,11 +23,11 @@ public class Main {
 	}
 	
 	public static void imprimirEstadoNodo(Node n){
-		System.out.println("Soy el nodo " + n.getMyPort() + " envio a " + n.getSender().getPortTo() + " recivo de " + n.getReceptor().getPortFrom());
+		System.out.println("Soy el nodo " + n.getId() + " envio a " + n.getSender().getConnectionTo().getId()+ " recivo de " + n.getReceptor().getConnectionFrom().getId());
 	}
 	
 	public static void imprimirListaDeMensajes(Node n){
-		System.out.println("----MENSAJES DE NODO " + n.getMyPort() + " -------------");
+		System.out.println("----MENSAJES DE NODO " + n.getId() + " -------------");
 		for (int i = 0 ; i < n.getMessages().size(); i++){
 			Message m = n.getMessages().get(i);
 			System.out.println(m.getFrom() + " : " + m.getBody());

@@ -1,8 +1,6 @@
 package node;
 
 public class User {
-
-	private Node node;
 	
 	private String username;
 	

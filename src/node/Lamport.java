@@ -13,7 +13,7 @@ public class Lamport {
 	
 	public Lamport(Node n){
 		this.node = n;
-		this.id = n.getMyIp() + ":" + n.getMyPort();
+		this.id = n.getId();
 	}
 	
 	public void getCurrentStatus(){

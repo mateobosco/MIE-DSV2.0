@@ -3,17 +3,18 @@ package receptor;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import node.Connection;
 import node.LamportStatus;
 import node.Message;
 
 public interface IReceptor extends Remote{
 	
-	public int login(String ipTo, int portTo, String ipFrom, int portFrom) throws RemoteException;
-	public int sendLogin(String ipOld, int portOld, String ipNew, int portNew) throws RemoteException;
-	public int sayHi(String ipFrom, int portFrom) throws RemoteException;
-	public int sendLogout(String ipFrom, int portFrom, String newLastIp, int newLastPort) throws RemoteException;
-	public int receiveMessage(Message message, String senderIp, int senderPort) throws RemoteException;
-	public int receiveLamportStatus(LamportStatus actualStatus, String senderIp, int SenderPort) throws RemoteException;
+	public int login(Connection connectionTo, Connection connectionFrom) throws RemoteException;
+	public int sendLogin(Connection connectionOld, Connection connectionNew) throws RemoteException;
+	public int sayHi(Connection connectionFrom) throws RemoteException;
+	public int sendLogout(Connection connectionFrom, Connection newLastConnection) throws RemoteException;
+	public int receiveMessage(Message message, Connection senderConnection) throws RemoteException;
+	public int receiveLamportStatus(LamportStatus actualStatus, Connection senderConnection) throws RemoteException;
 
 
 }

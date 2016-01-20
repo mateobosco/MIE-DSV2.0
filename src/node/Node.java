@@ -15,23 +15,21 @@ public class Node {
 	private Sender sender;
 	private Lamport lamport;
 	
-	private String myIp;
-	private int myPort;
+	private Connection myConnection;
 	
 	private ArrayList<Message> messageList;
 	
-	public Node(String ipTo, int portTo, String myIp, int myPort){
-		this.myIp = myIp;
-		this.myPort = myPort;
+	public Node(Connection connectionTo, Connection myConnection){
+		this.myConnection = myConnection;
 		
-		this.receptor = this.createReceptor(myPort);
-		this.sender = new Sender(this, ipTo, portTo);
+		this.receptor = this.createReceptor(myConnection.getPort());
+		this.sender = new Sender(this, connectionTo);
 		this.lamport = new Lamport(this);
 		this.messageList = new ArrayList<Message>();
 		
 		this.sender.connect();
 				
-		this.sender.login(ipTo, portTo, myIp, myPort);	
+		this.sender.login(connectionTo, myConnection);	
 	}
 	
 	public int sendMessage(Message message){
@@ -41,53 +39,51 @@ public class Node {
 		return 0;
 	}
 	
-	public int receiveMessage(Message message, String senderIp, int senderPort){
+	public int receiveMessage(Message message, Connection connectionSender){
 		this.messageList.add(message);
-		if (!senderIp.equals(this.myIp) || senderPort != this.myPort){
-			this.sender.retransmitMessage(message, senderIp, senderPort);
+		if (!myConnection.equals(connectionSender)){
+			this.sender.retransmitMessage(message, connectionSender);
 		}
 		return 0;
 	}
 	
-	public int receiveLogin(String ipTo, int portTo, String ipFrom, int portFrom){
-				
-		String senderIpTo = this.sender.getIpTo();
-		int senderPortTo = this.sender.getPortTo();
-		if (senderIpTo.equals(ipTo) && senderPortTo == portTo){
-			this.sender = new Sender(this, ipFrom, portFrom);
+	public int receiveLogin(Connection connectionTo, Connection connectionFrom){
+			
+		Connection senderConnectionTo = this.sender.getConnectionTo();
+		if (senderConnectionTo.equals(connectionTo)){
+			this.sender = new Sender(this, connectionFrom);
 			this.sender.connect();
 		}
 		else{
-			this.sender.sendLogin(myIp, myPort, ipFrom, portFrom);
+			this.sender.sendLogin(myConnection, connectionFrom);
 		}
 		return 0;	
 	}
 	
-	public int sendLogin(String ipOld, int portOld, String ipNew, int portNew){
-		
-		String senderIpTo = this.sender.getIpTo();
-		int senderPortTo = this.sender.getPortTo();
-		if (senderIpTo.equals(ipOld) && senderPortTo == portOld){
-			this.sender = new Sender(this, ipNew, portNew);
+	public int sendLogin(Connection connectionOld, Connection connectionNew){
+
+		Connection senderConnectionTo = this.sender.getConnectionTo();
+		if (senderConnectionTo.equals(connectionOld)){
+			this.sender = new Sender(this, connectionNew);
 			this.sender.connect();
 		}else{
-			this.sender.sendLogin(ipOld, portOld, ipNew, portNew);
+			this.sender.sendLogin(connectionOld, connectionNew);
 		}
 		
 		return 0;
 	}
 	
 	public int logout(){
-		return this.sender.sendLogout(myIp, myPort, this.sender.getIpTo(), this.sender.getPortTo());
+		return this.sender.sendLogout(myConnection, this.sender.getConnectionTo());
 	}
 	
-	public int sendLogout(String disconnectedIp, int disconnectedPort, String newLastIp, int newLastPort){
-		if (disconnectedIp.equals(this.sender.getIpTo()) && disconnectedPort == this.sender.getPortTo()){
-			this.sender = new Sender(this, newLastIp, newLastPort);
+	public int sendLogout(Connection disconnectedConnection, Connection newLastConnection){
+		if (disconnectedConnection.equals(this.sender.getConnectionTo())){
+			this.sender = new Sender(this, newLastConnection);
 			this.sender.connect();
 		}
 		else{
-			this.sender.sendLogout(disconnectedIp, disconnectedPort, newLastIp, newLastPort);
+			this.sender.sendLogout(disconnectedConnection, newLastConnection);
 		}
 		
 		return 0;
@@ -102,9 +98,9 @@ public class Node {
 		try {
 			receptor = new Receptor(this);
 			
-			IReceptor stub = (IReceptor) UnicastRemoteObject.exportObject(receptor, myPort);
+			IReceptor stub = (IReceptor) UnicastRemoteObject.exportObject(receptor, myConnection.getPort());
 			
-			Registry registry = LocateRegistry.createRegistry(myPort);
+			Registry registry = LocateRegistry.createRegistry(myConnection.getPort());
 //			registry.rebind(name, receptor);
 			registry.rebind(name, stub);
 		}
@@ -121,13 +117,13 @@ public class Node {
 	public Sender getSender() {
 		return sender;
 	}
-
-	public String getMyIp() {
-		return myIp;
+	
+	public Connection getMyConnection(){
+		return this.myConnection;
 	}
-
-	public int getMyPort() {
-		return myPort;
+	
+	public String getId(){
+		return myConnection.getId();
 	}
 	
 	public ArrayList<Message> getMessages(){
@@ -139,7 +135,7 @@ public class Node {
 	}
 	
 	public void getCurrentLamportStatus(){
-		this.sender.getLamportStatus(this.myIp, this.myPort);
+		this.sender.getLamportStatus(this.myConnection);
 	}
 	
 	

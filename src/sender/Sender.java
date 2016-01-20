@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
+import node.Connection;
 import node.LamportStatus;
 import node.Message;
 import node.Node;
@@ -13,15 +14,13 @@ import receptor.IReceptor;
 
 public class Sender {
 	
-	private String ipTo;
-	private int portTo;
+	private Connection connectionTo;
 	private Node node;
 	private IReceptor receptor;
 	
-	public Sender(Node node, String ipTo, int portTo){
+	public Sender(Node node, Connection connectionTo){
 		this.node = node;
-		this.ipTo = ipTo;
-		this.portTo = portTo;
+		this.connectionTo = connectionTo;
 	}
 	
 	public int connect(){
@@ -29,9 +28,9 @@ public class Sender {
 		String name = "Receptor";
 		Registry registry;
 		try {
-			registry = LocateRegistry.getRegistry(this.ipTo, this.portTo);
+			registry = LocateRegistry.getRegistry(this.connectionTo.getIp(), this.connectionTo.getPort());
 			this.receptor = (IReceptor) registry.lookup(name);
-			this.receptor.sayHi(node.getMyIp(), node.getMyPort());
+			this.receptor.sayHi(node.getMyConnection());
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		} catch (NotBoundException e) {
@@ -41,9 +40,9 @@ public class Sender {
 		return 0;
 	}
 	
-	public int login(String ipTo, int portTo, String myIp, int myPort){
+	public int login(Connection connectionTo, Connection myConnection){
 		try {
-			this.receptor.login(ipTo, portTo, myIp, myPort);
+			this.receptor.login(connectionTo, myConnection);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
@@ -51,9 +50,9 @@ public class Sender {
 		return 0;
 	}
 	
-	public int sendLogin(String ipFrom, int portFrom, String ipNew, int portNew){
+	public int sendLogin(Connection connectionFrom, Connection connectionNew){
 		try {
-			this.receptor.sendLogin(ipFrom, portFrom, ipNew, portNew);
+			this.receptor.sendLogin(connectionFrom, connectionNew);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
@@ -61,9 +60,9 @@ public class Sender {
 		return 0;
 	}
 	
-	public int sendLogout(String disconnectedIp, int disconnectedPort, String newLastIp, int newLastPort){
+	public int sendLogout(Connection disconnectedConnection, Connection newLastConnection){
 		try {
-			this.receptor.sendLogout(disconnectedIp, disconnectedPort, newLastIp, newLastPort);
+			this.receptor.sendLogout(disconnectedConnection, newLastConnection);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
@@ -73,44 +72,40 @@ public class Sender {
 	public int sendMessage(Message message){
 		int val = -1;
 		try {
-			val = this.receptor.receiveMessage(message, this.node.getMyIp(), this.node.getMyPort());
+			val = this.receptor.receiveMessage(message, this.node.getMyConnection());
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
 		return val;
 	}
 	
-	public int retransmitMessage(Message message, String senderIp, int senderPort){
+	public int retransmitMessage(Message message, Connection senderConnection){
 		int val = -1;
 		try {
-			val = this.receptor.receiveMessage(message, senderIp, senderPort);
+			val = this.receptor.receiveMessage(message, senderConnection);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
 		return val;
 	}
 	
-	public String getIpTo(){
-		return ipTo;
+	public Connection getConnectionTo(){
+		return this.connectionTo;
 	}
 	
-	public int getPortTo(){
-		return portTo;
-	}
-	
-	public void getLamportStatus(String senderIp, int senderPort){
+	public void getLamportStatus(Connection senderConnection){
 		LamportStatus actualStatus = new LamportStatus();
 		try {
-			this.receptor.receiveLamportStatus(actualStatus, senderIp, senderPort);
+			this.receptor.receiveLamportStatus(actualStatus, senderConnection);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
 		
 	}
 
-	public void retransmitLamportStatus(LamportStatus actualStatus,	String senderIp, int senderPort) {
+	public void retransmitLamportStatus(LamportStatus actualStatus,	Connection senderConnection) {
 		try {
-			this.receptor.receiveLamportStatus(actualStatus, senderIp, senderPort);
+			this.receptor.receiveLamportStatus(actualStatus, senderConnection);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
