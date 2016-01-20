@@ -67,8 +67,8 @@ public class Receptor implements IReceptor{
 	
 	public int updateNetworkStatus(NetworkStatus status) throws RemoteException{
 		status.set(this.node.getMyConnection(), this.node.getSender().getConnectionTo());
-		
-		if (!status.isNew()) this.node.updateNetworkStatus(status);
+
+		if (!status.isNew() && status.getKeys().size() != 0) this.node.updateNetworkStatus(status);
 		
 		this.node.getSender().sendNetworkStatus(status);
 		return 0;

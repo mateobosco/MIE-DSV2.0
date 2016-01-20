@@ -42,6 +42,7 @@ public class Sender {
 	}
 	
 	public int login(Connection connectionTo, Connection myConnection){
+		preventCrash();
 		try {
 			this.receptor.login(connectionTo, myConnection);
 		} catch (RemoteException e) {
@@ -52,6 +53,7 @@ public class Sender {
 	}
 	
 	public int sendLogin(Connection connectionFrom, Connection connectionNew){
+		preventCrash();
 		try {
 			this.receptor.sendLogin(connectionFrom, connectionNew);
 		} catch (RemoteException e) {
@@ -62,6 +64,7 @@ public class Sender {
 	}
 	
 	public int sendLogout(Connection disconnectedConnection, Connection newLastConnection){
+		preventCrash();
 		try {
 			this.receptor.sendLogout(disconnectedConnection, newLastConnection);
 		} catch (RemoteException e) {
@@ -71,6 +74,7 @@ public class Sender {
 	}
 	
 	public int sendMessage(Message message){
+		preventCrash();
 		int val = -1;
 		try {
 			val = this.receptor.receiveMessage(message, this.node.getMyConnection());
@@ -81,6 +85,7 @@ public class Sender {
 	}
 	
 	public int retransmitMessage(Message message, Connection senderConnection){
+		preventCrash();
 		int val = -1;
 		try {
 			val = this.receptor.receiveMessage(message, senderConnection);
@@ -95,6 +100,7 @@ public class Sender {
 	}
 	
 	public void getLamportStatus(Connection senderConnection){
+		preventCrash();
 		LamportStatus actualStatus = new LamportStatus();
 		try {
 			this.receptor.receiveLamportStatus(actualStatus, senderConnection);
@@ -105,6 +111,7 @@ public class Sender {
 	}
 
 	public void retransmitLamportStatus(LamportStatus actualStatus,	Connection senderConnection) {
+		preventCrash();
 		try {
 			this.receptor.receiveLamportStatus(actualStatus, senderConnection);
 		} catch (RemoteException e) {
@@ -113,6 +120,7 @@ public class Sender {
 	}
 
 	public void sendNetworkStatus(NetworkStatus status) {
+		preventCrash();
 		if (!status.isTriple()){
 			try {
 				this.receptor.updateNetworkStatus(status);
@@ -120,7 +128,34 @@ public class Sender {
 				e.printStackTrace();
 			}	
 		}
-		
+	}
+	
+	private boolean checkNextAlive(){
+		boolean sendSuccess = false;
+		try {
+			this.receptor.sayHi(connectionTo);
+			sendSuccess = true;
+		} catch (RemoteException e) {
+			System.out.println("-----------Crash detected------------");
+			this.connectionTo = this.node.getNetworkStatus().getTable().get(this.connectionTo.getId());
+			this.connect();
+		}
+		return sendSuccess;
+	}
+	
+	public void preventCrash(){
+		boolean crashed = false;
+		boolean res = false;
+		while (!res){
+			res = checkNextAlive();
+			if (res == false) crashed = true;
+		}
+		if (crashed){
+			NetworkStatus ns = this.node.getNetworkStatus();
+			ns.set(node.getMyConnection(), this.connectionTo);
+			ns.restartCounter();
+			this.sendNetworkStatus(ns);
+		}
 	}
 
 

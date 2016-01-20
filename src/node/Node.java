@@ -33,6 +33,7 @@ public class Node {
 				
 		this.sender.login(connectionTo, myConnection);
 		this.sender.sendNetworkStatus(this.status);
+		
 	}
 	
 	public int sendMessage(Message message){
@@ -96,7 +97,6 @@ public class Node {
 	
 	private Receptor createReceptor(int myPort){
 		String name = "Receptor";
-//		String name2 = "Receptor2";
 		Receptor receptor = null;
 		try {
 			receptor = new Receptor(this);
@@ -104,7 +104,6 @@ public class Node {
 			IReceptor stub = (IReceptor) UnicastRemoteObject.exportObject(receptor, myConnection.getPort());
 			
 			Registry registry = LocateRegistry.createRegistry(myConnection.getPort());
-//			registry.rebind(name, receptor);
 			registry.rebind(name, stub);
 		}
 		catch (Exception e) {
@@ -142,7 +141,8 @@ public class Node {
 	}
 	
 	public void updateNetworkStatus(NetworkStatus status){
-		this.status = status;
+		
+		this.status.setTable(status.getTable());
 	}
 	
 	public NetworkStatus getNetworkStatus(){

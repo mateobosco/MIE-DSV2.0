@@ -12,30 +12,40 @@ public class NetworkStatus implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 	private HashMap<String, Connection> table;
-	private boolean isNew = true;
-	private boolean isTriple = false;
+	private int counter = 0;
 	
 	public NetworkStatus(){
 		this.table = new HashMap<String, Connection>();
 	}
 	
-	public void set(Connection sender, Connection receiver){
-		if (table.containsKey(sender.getId()) && !isNew) isTriple = true;
-		if (table.containsKey(sender.getId())) isNew = false;
+	public void set(Connection sender, Connection receiver){		
+		if (table.containsKey(sender.getId())) counter ++;
+		else counter = 0;
 		table.put(sender.getId(), receiver);
-		System.out.println("agrego una linea");
 	}
 	
 	public void remove(Connection disconnected){
 		table.remove(disconnected.getId());
 	}
+	
+	public void setTable(HashMap<String, Connection> table){
+		this.table = table;
+	}
+	
+	public HashMap<String, Connection> getTable(){
+		return table;
+	}
 
 	public boolean isNew() {
-		return isNew;
+		return counter == 0;
 	}
 	
 	public boolean isTriple(){
-		return this.isTriple;
+		return counter >=10;
+	}
+	
+	public void restartCounter(){
+		this.counter = 0;
 	}
 	
 	public void print(){

@@ -19,11 +19,6 @@ public class Lamport {
 	public void getCurrentStatus(){
 		this.node.getCurrentLamportStatus();
 		this.ready = false;
-//		try {
-//			this.wait();
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
 		while (this.ready){
 			Thread.yield();
 		}
@@ -33,12 +28,10 @@ public class Lamport {
 	public void updateCurrentStatus(LamportStatus ls){
 		this.currentStatus = ls;
 		this.ready = true;
-//		this.notify();
 	}
 	
 	
 	public void lock(){
-//		entering.set(id, true);
 		myEntering = true;
 
     	getCurrentStatus();
@@ -53,9 +46,6 @@ public class Lamport {
 				max = current;
 			}
     	}
-    	
-//    	ticket.set(id, 1 + max); 
-//    	entering.set(id, false);
     	this.myTicket = 1 + max;
     	this.myEntering = false;
     	
@@ -78,12 +68,9 @@ public class Lamport {
     			}
     		}
     	}
-    	System.out.println(this.id + " consegui el lock");
 	}
 	
-	public void unlock(){
-		System.out.println(this.id + " desbloqueo");
-		
+	public void unlock(){		
 		this.myTicket = 0;
 	}
 	
