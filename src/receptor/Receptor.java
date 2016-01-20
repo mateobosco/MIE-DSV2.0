@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import node.Connection;
 import node.LamportStatus;
 import node.Message;
+import node.NetworkStatus;
 import node.Node;
 
 public class Receptor implements IReceptor{
@@ -62,6 +63,15 @@ public class Receptor implements IReceptor{
 		}
 		return 0;
 
+	}
+	
+	public int updateNetworkStatus(NetworkStatus status) throws RemoteException{
+		status.set(this.node.getMyConnection(), this.node.getSender().getConnectionTo());
+		
+		if (!status.isNew()) this.node.updateNetworkStatus(status);
+		
+		this.node.getSender().sendNetworkStatus(status);
+		return 0;
 	}
 
 

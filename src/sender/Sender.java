@@ -8,6 +8,7 @@ import java.rmi.registry.Registry;
 import node.Connection;
 import node.LamportStatus;
 import node.Message;
+import node.NetworkStatus;
 import node.Node;
 
 import receptor.IReceptor;
@@ -109,6 +110,17 @@ public class Sender {
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void sendNetworkStatus(NetworkStatus status) {
+		if (!status.isTriple()){
+			try {
+				this.receptor.updateNetworkStatus(status);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}	
+		}
+		
 	}
 
 

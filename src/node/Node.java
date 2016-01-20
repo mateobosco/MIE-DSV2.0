@@ -14,6 +14,7 @@ public class Node {
 	private Receptor receptor;
 	private Sender sender;
 	private Lamport lamport;
+	private NetworkStatus status;
 	
 	private Connection myConnection;
 	
@@ -25,11 +26,13 @@ public class Node {
 		this.receptor = this.createReceptor(myConnection.getPort());
 		this.sender = new Sender(this, connectionTo);
 		this.lamport = new Lamport(this);
+		this.status = new NetworkStatus();
 		this.messageList = new ArrayList<Message>();
 		
 		this.sender.connect();
 				
-		this.sender.login(connectionTo, myConnection);	
+		this.sender.login(connectionTo, myConnection);
+		this.sender.sendNetworkStatus(this.status);
 	}
 	
 	public int sendMessage(Message message){
@@ -136,6 +139,14 @@ public class Node {
 	
 	public void getCurrentLamportStatus(){
 		this.sender.getLamportStatus(this.myConnection);
+	}
+	
+	public void updateNetworkStatus(NetworkStatus status){
+		this.status = status;
+	}
+	
+	public NetworkStatus getNetworkStatus(){
+		return this.status;
 	}
 	
 	

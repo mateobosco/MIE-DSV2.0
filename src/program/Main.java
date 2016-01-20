@@ -11,7 +11,7 @@ public class Main {
 		
 		Node node1 = new Node(new Connection("127.0.0.1", 2010), new Connection( "127.0.0.1", 2010));
 		Node node2 = new Node(new Connection("127.0.0.1", 2010), new Connection( "127.0.0.1", 2011));
-//		Node node2 = new Node("127.0.0.1", 2010, "127.0.0.1", 2011);
+		Node node3 = new Node(new Connection("127.0.0.1", 2010), new Connection( "127.0.0.1", 2012));
 		
 //		Node node4 = new Node("127.0.0.1", 2011, "127.0.0.1", 2014);
 //		Node node5 = new Node("127.0.0.1", 2011, "127.0.0.1", 2015);
@@ -20,6 +20,9 @@ public class Main {
 		
 		node1.sendMessage(m);
 		imprimirListaDeMensajes(node1);
+		node1.getNetworkStatus().print();
+		node2.getNetworkStatus().print();
+		node3.getNetworkStatus().print();
 	}
 	
 	public static void imprimirEstadoNodo(Node n){

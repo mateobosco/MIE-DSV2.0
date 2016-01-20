@@ -6,6 +6,7 @@ import java.rmi.RemoteException;
 import node.Connection;
 import node.LamportStatus;
 import node.Message;
+import node.NetworkStatus;
 
 public interface IReceptor extends Remote{
 	
@@ -15,6 +16,7 @@ public interface IReceptor extends Remote{
 	public int sendLogout(Connection connectionFrom, Connection newLastConnection) throws RemoteException;
 	public int receiveMessage(Message message, Connection senderConnection) throws RemoteException;
 	public int receiveLamportStatus(LamportStatus actualStatus, Connection senderConnection) throws RemoteException;
+	public int updateNetworkStatus(NetworkStatus status) throws RemoteException;
 
 
 }
