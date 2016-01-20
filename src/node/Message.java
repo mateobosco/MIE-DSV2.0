@@ -26,6 +26,15 @@ public class Message implements Serializable {
 		this.connection = false;
 	}
 	
+	public Message(Node node, User user, String body){
+		this.from = node.getId();
+		this.username = user.getUsername();
+		this.body = body;
+		this.date = new Date();
+//		this.logicalTime = LogicalClock.getInstance().getTime();
+		this.connection = false;
+	}
+	
 	public String getFrom(){
 		return this.from;
 	}

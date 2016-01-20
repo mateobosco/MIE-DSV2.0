@@ -2,22 +2,25 @@ package program;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-public class ChatGUI extends JFrame implements WindowListener, MouseListener, KeyListener{
+import node.Connection;
+import node.Message;
+import node.Node;
+import node.User;
+
+public class ChatGUI extends JFrame implements WindowListener, MouseListener, KeyListener, MessageReceiver{
 
 	private static final long serialVersionUID = 1L;
 	private TextArea messageArea = null;
 	private TextField sendArea = null;
-//	private Node node = null;
-//	private User user = null
+	private Node node = null;
+	private User user = null;
 	
 	
-	public ChatGUI(String username){
+	public ChatGUI(Configuration conf){
 		super("Chat");
 		this.addWindowListener(this);
 		this.setSize(400,500);
@@ -26,7 +29,7 @@ public class ChatGUI extends JFrame implements WindowListener, MouseListener, Ke
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.addWindowListener(new java.awt.event.WindowAdapter() {
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-//		        client.exit();
+		        node.logout();
 		    }
 		});
 		
@@ -52,31 +55,32 @@ public class ChatGUI extends JFrame implements WindowListener, MouseListener, Ke
 		this.setVisible(true);
 		this.sendArea.requestFocus();
 		
-//		this.client = new Client(username);
-//		try {
-//			this.client.connect();
-//		} catch (RemoteException | NotBoundException e) {
-//			e.printStackTrace();
-//		}
-//		Thread messageReceiver = new Thread(new MessageReceiver(this.client,this.messageArea));
-//		messageReceiver.start();
+
+		Connection connTo = new Connection( conf.destinationIp, conf.destinationPort);
+		Connection connLocal = new Connection(conf.localIp, conf.localPort);
+		this.node = new Node(connTo, connLocal);
+		this.user = new User(conf.username);
+		this.node.setMessageReceiver(this);
 	}
 	
 	public void enterText(){
 		String text = this.sendArea.getText();
 		if (text.length() < 1) return;
-		this.sendArea.setText("");		
-//		try {
-//			this.client.send(text);
-//		} catch (RemoteException e) {
-//			e.printStackTrace();
-//		}
+		this.sendArea.setText("");
+		Message m = new Message(this.node, this.user, text);
+		this.node.sendMessage(m);
 	}
 	
 	public void keyPressed(KeyEvent arg0) {	
 		if (arg0.getKeyCode() == KeyEvent.VK_ENTER){
 			enterText();
 		}
+	}
+	
+	@SuppressWarnings("deprecation")
+	public void receiveMessage(Message m) {
+		String time = m.getDate().getHours() + ":" + m.getDate().getMinutes();
+		this.messageArea.append(m.getUsername() + " (" + time + ")> " + m.getBody() + "\n" );
 	}
 
 	public void keyReleased(KeyEvent arg0) {}
@@ -110,4 +114,6 @@ public class ChatGUI extends JFrame implements WindowListener, MouseListener, Ke
 	public void windowIconified(WindowEvent e) {}
 
 	public void windowOpened(WindowEvent e) {}
+
+
 }

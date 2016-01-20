@@ -53,10 +53,10 @@ public class Main {
 	
 	public static void imprimirListaDeMensajes(Node n){
 		System.out.println("----MENSAJES DE NODO " + n.getId() + " -------------");
-		for (int i = 0 ; i < n.getMessages().size(); i++){
-			Message m = n.getMessages().get(i);
-			System.out.println(m.getFrom() + " : " + m.getBody());
-		}
+//		for (int i = 0 ; i < n.getMessages().size(); i++){
+//			Message m = n.getMessages().get(i);
+//			System.out.println(m.getFrom() + " : " + m.getBody());
+//		}
 	}
 
 }

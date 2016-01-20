@@ -3,7 +3,8 @@ package node;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
+
+import program.MessageReceiver;
 
 import receptor.IReceptor;
 import receptor.Receptor;
@@ -17,8 +18,8 @@ public class Node {
 	private NetworkStatus status;
 	
 	private Connection myConnection;
-	
-	private ArrayList<Message> messageList;
+		
+	private MessageReceiver receiver = null;
 	
 	public Node(Connection connectionTo, Connection myConnection){
 		this.myConnection = myConnection;
@@ -27,7 +28,6 @@ public class Node {
 		this.sender = new Sender(this, connectionTo);
 		this.lamport = new Lamport(this);
 		this.status = new NetworkStatus();
-		this.messageList = new ArrayList<Message>();
 		
 		this.sender.connect();
 				
@@ -44,10 +44,14 @@ public class Node {
 	}
 	
 	public int receiveMessage(Message message, Connection connectionSender){
-		this.messageList.add(message);
 		if (!myConnection.equals(connectionSender)){
 			this.sender.retransmitMessage(message, connectionSender);
 		}
+		
+		if (this.receiver != null){
+			this.receiver.receiveMessage(message);
+		}
+		
 		return 0;
 	}
 	
@@ -93,8 +97,10 @@ public class Node {
 		return 0;
 	}
 	
-	
-	
+	public void setMessageReceiver(MessageReceiver receiver){
+		this.receiver = receiver;
+	}
+
 	private Receptor createReceptor(int myPort){
 		String name = "Receptor";
 		Receptor receptor = null;
@@ -126,10 +132,6 @@ public class Node {
 	
 	public String getId(){
 		return myConnection.getId();
-	}
-	
-	public ArrayList<Message> getMessages(){
-		return this.messageList;
 	}
 	
 	public Lamport getLamport(){
