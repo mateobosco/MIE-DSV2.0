@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
+import node.LamportUpdate;
 import node.Node;
 
 import receptor.IReceptor;
@@ -94,6 +95,23 @@ public class Sender {
 	
 	public int getPortTo(){
 		return portTo;
+	}
+
+
+	public void sendLamportUpdate(LamportUpdate lu) {
+		try {
+			this.receptor.receiveLamportUpdate(lu, this.node.getMyIp(), this.node.getMyPort());
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}		
+	}
+
+	public void retransmitLamportUpdate(LamportUpdate lu, String senderIp,int senderPort) {
+		try {
+			this.receptor.receiveLamportUpdate(lu, senderIp, senderPort);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
 	}
 
 

@@ -6,17 +6,22 @@ public class Main {
 	public static void main(String[] args){
 		
 		Node node1 = new Node("127.0.0.1", 2010, "127.0.0.1", 2010);
-		Node node2 = new Node("127.0.0.1", 2010, "127.0.0.1", 2011);
-		Node node3 = new Node("127.0.0.1", 2011, "127.0.0.1", 2012);
-		Node node4 = new Node("127.0.0.1", 2011, "127.0.0.1", 2014);
-		Node node5 = new Node("127.0.0.1", 2011, "127.0.0.1", 2015);
+//		Node node2 = new Node("127.0.0.1", 2010, "127.0.0.1", 2011);
+		
+//		Node node4 = new Node("127.0.0.1", 2011, "127.0.0.1", 2014);
+//		Node node5 = new Node("127.0.0.1", 2011, "127.0.0.1", 2015);
+
 		
 		node1.sendMessage("me conecte manga de caretaas");
-		imprimirListaDeMensajes(node1);
-		imprimirListaDeMensajes(node2);
-		imprimirListaDeMensajes(node3);
-		imprimirListaDeMensajes(node4);
-		imprimirListaDeMensajes(node5);
+		node1.getLamport().lock();
+		
+		try {
+		    Thread.sleep(8000);
+		} catch(InterruptedException ex) {
+		    Thread.currentThread().interrupt();
+		}
+		
+		node1.getLamport().unlock();
 	}
 	
 	public static void imprimirEstadoNodo(Node n){

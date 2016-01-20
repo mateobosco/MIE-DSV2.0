@@ -13,6 +13,7 @@ public class Node {
 
 	private Receptor receptor;
 	private Sender sender;
+	private Lamport lamport;
 	
 	private String myIp;
 	private int myPort;
@@ -25,6 +26,7 @@ public class Node {
 		
 		this.receptor = this.createReceptor(myPort);
 		this.sender = new Sender(this, ipTo, portTo);
+		this.lamport = new Lamport(this);
 		this.messageList = new ArrayList<String>();
 		
 		this.sender.connect();
@@ -94,16 +96,16 @@ public class Node {
 	
 	private Receptor createReceptor(int myPort){
 		String name = "Receptor";
-		String name2 = "Receptor2";
+//		String name2 = "Receptor2";
 		Receptor receptor = null;
 		try {
 			receptor = new Receptor(this);
 			
-			IReceptor stub = (IReceptor) UnicastRemoteObject.exportObject(receptor, 50000);
+			IReceptor stub = (IReceptor) UnicastRemoteObject.exportObject(receptor, myPort);
 			
 			Registry registry = LocateRegistry.createRegistry(myPort);
-			registry.rebind(name, receptor);
-			registry.rebind(name2, stub);
+//			registry.rebind(name, receptor);
+			registry.rebind(name, stub);
 		}
 		catch (Exception e) {
 			System.err.println("Data exception: " + e.getMessage());
@@ -129,6 +131,14 @@ public class Node {
 	
 	public ArrayList<String> getMessages(){
 		return this.messageList;
+	}
+	
+	public Lamport getLamport(){
+		return this.lamport;
+	}
+
+	public void sendLamportUpdate(LamportUpdate lu) {
+		this.sender.sendLamportUpdate(lu);
 	}
 	
 	
