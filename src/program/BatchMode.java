@@ -40,6 +40,7 @@ public class BatchMode {
 		
 		Thread clientThread5 = new Thread(new BatchThread(node5, userKocho));
 		clientThread5.start();
+		
 	}
 	
 	public static void imprimirEstadoNodo(Node n){

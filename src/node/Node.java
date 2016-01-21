@@ -119,8 +119,8 @@ public class Node {
 		Receptor receptor = null;
 		try {
 			receptor = new Receptor(this);
-			
-			IReceptor stub = (IReceptor) UnicastRemoteObject.exportObject(receptor, myConnection.getPort());
+			System.setProperty("java.rmi.server.hostname", this.myConnection.getIp());
+			IReceptor stub = (IReceptor) UnicastRemoteObject.exportObject(receptor, 0);
 			
 			Registry registry = LocateRegistry.createRegistry(myConnection.getPort());
 			registry.rebind(name, stub);
